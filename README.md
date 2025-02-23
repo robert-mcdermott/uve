@@ -87,6 +87,9 @@ uve activate myenv
 
 # Deactivate current environment
 uve deactivate
+
+# Show version of uve you are running
+uve version
 ```
 
 ### Examples

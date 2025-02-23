@@ -10,6 +10,11 @@ import (
 	"runtime"
 )
 
+// Version information
+const (
+	VERSION = "0.1.0"
+)
+
 // Environment variables used by the virtual environment manager
 const (
 	UVE_HOME_ENV     = "UVE_HOME"     // Directory where virtual environments are stored
@@ -116,6 +121,10 @@ unset VIRTUAL_ENV
 `
 }
 
+func printVersion() {
+	fmt.Printf("uve version %s\n", VERSION)
+}
+
 // printUsage prints the command-line usage instructions
 func printUsage() {
 	fmt.Printf(`Usage: uve <command> [args]
@@ -125,6 +134,7 @@ Commands:
   activate <name>                 Print activation script for environment
   deactivate                     Print deactivation script
   list                          List all environments
+  version                       Show version information
 `)
 }
 
@@ -187,6 +197,9 @@ func main() {
 
 	case "list":
 		listEnvs()
+
+	case "version":
+		printVersion()
 
 	default:
 		printUsage()
