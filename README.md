@@ -83,10 +83,10 @@ uve create myenv [python-version]
 uve list
 
 # Activate an environment
-uve_activate myenv
+uve activate myenv
 
 # Deactivate current environment
-uve_deactivate
+uve deactivate
 ```
 
 ### Examples
@@ -99,7 +99,7 @@ uve create ml-project 3.11
 uve list
 
 # Activate environment
-uve_activate ml-project
+uve activate ml-project
 
 # Verify activation
 which python  # or `Get-Command python` on PowerShell
@@ -113,7 +113,7 @@ uv pip install -r requirements.txt  # Install from requirements file
 uv pip list
 
 # Deactivate environment
-uve_deactivate
+uve deactivate
 ```
 
 ## Configuration
