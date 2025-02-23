@@ -13,18 +13,25 @@ UVE is a lightweight Python virtual environment manager that works with [UV](htt
 
 ## Prerequisites
 
-- [Go](https://golang.org/doc/install) (for building from source only)
-- [UV](https://github.com/astral-sh/uv)
+- [Go](https://golang.org/doc/install) - Optional, only needed if building from source
+- [UV](https://github.com/astral-sh/uv) - Installed
 
 ## Installation
 
-### Clone and build:
+### Installing from source:
+
+If you are building it yourself, clone the repo and build the binary:
 
 ```bash
 git clone https://github.com/robert-mcdermott/uve.git
 cd uve
 go build -o uve-bin main.go
 ```
+
+### Installation from pre-built binary:
+
+If you've rather just use a pre-built binary, download the binary archive for your platform (os and architecture) from the [releases page](https://github.com/robert-mcdermott/uve/releases)
+and extract the archive to a directory of your choice.
 
 ### Install the binary:
 
@@ -43,7 +50,7 @@ Windows (PowerShell Admin):
 # Create directory for binary
 mkdir "$env:USERPROFILE\bin" -ErrorAction SilentlyContinue
 # Copy binary as uve-bin
-cp uve-bin.exe "$env:USERPROFILE\bin/uve-bin.exe"
+cp uve-bin.exe "$env:USERPROFILE\bin\uve-bin.exe"
 # Add to PATH (permanent)
 [Environment]::SetEnvironmentVariable(
     "Path",
