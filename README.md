@@ -23,7 +23,7 @@ UVE is a lightweight Python virtual environment manager that works with [UV](htt
 ```bash
 git clone https://github.com/robert-mcdermott/uve.git
 cd uve
-go build -o uve main.go
+go build -o uve-bin main.go
 ```
 
 ### Install the binary:
@@ -33,7 +33,7 @@ Linux/macOS:
 # Create bin directory if it doesn't exist
 mkdir -p ~/bin
 # Copy the binary as uve-bin
-cp uve ~/bin/uve-bin
+cp uve-bin ~/bin/uve-bin
 # Add to PATH (add this to your .bashrc or .zshrc)
 export PATH="$HOME/bin:$PATH"
 ```
@@ -43,7 +43,7 @@ Windows (PowerShell Admin):
 # Create directory for binary
 mkdir "$env:USERPROFILE\bin" -ErrorAction SilentlyContinue
 # Copy binary as uve-bin
-cp uve.exe "$env:USERPROFILE\bin/uve-bin.exe"
+cp uve-bin.exe "$env:USERPROFILE\bin/uve-bin.exe"
 # Add to PATH (permanent)
 [Environment]::SetEnvironmentVariable(
     "Path",
