@@ -32,8 +32,8 @@ Linux/macOS:
 ```bash
 # Create bin directory if it doesn't exist
 mkdir -p ~/bin
-# Copy the binary
-cp uve ~/bin/
+# Copy the binary as uve-bin
+cp uve ~/bin/uve-bin
 # Add to PATH (add this to your .bashrc or .zshrc)
 export PATH="$HOME/bin:$PATH"
 ```
@@ -42,8 +42,8 @@ Windows (PowerShell Admin):
 ```powershell
 # Create directory for binary
 mkdir "$env:USERPROFILE\bin" -ErrorAction SilentlyContinue
-# Copy binary
-cp uve.exe "$env:USERPROFILE\bin"
+# Copy binary as uve-bin
+cp uve.exe "$env:USERPROFILE\bin/uve-bin.exe"
 # Add to PATH (permanent)
 [Environment]::SetEnvironmentVariable(
     "Path",

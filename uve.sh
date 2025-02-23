@@ -5,20 +5,28 @@ if [ -z "$UVE_OLD_PS1" ]; then
     export UVE_OLD_PS1="$PS1"
 fi
 
-uve_activate() {
-    if [ -z "$1" ]; then
-        echo "Error: Environment name required"
-        return 1
-    fi
-    eval "$(uve activate "$1")"
-    # Update prompt to show environment name
-    export PS1="($1) $UVE_OLD_PS1"
-}
-
-uve_deactivate() {
-    eval "$(uve deactivate)"
-    # Restore original prompt
-    export PS1="$UVE_OLD_PS1"
+# Main uve command function
+uve() {
+    case "$1" in
+        "activate")
+            if [ -z "$2" ]; then
+                echo "Error: Environment name required"
+                return 1
+            fi
+            eval "$(uve-bin activate "$2")"
+            # Update prompt to show environment name
+            export PS1="($2) $UVE_OLD_PS1"
+            ;;
+        "deactivate")
+            eval "$(uve-bin deactivate)"
+            # Restore original prompt
+            export PS1="$UVE_OLD_PS1"
+            ;;
+        *)
+            # Pass all other commands to the binary
+            uve-bin "$@"
+            ;;
+    esac
 }
 
 # Check if the script is being sourced
