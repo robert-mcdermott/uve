@@ -98,49 +98,120 @@ Get-Command uve
 
 ### Command Line Interface
 
+Create a new environment:
+
 ```bash
-# Create a new environment
 uve create myenv [python-version]
+```
 
-# List all environments
+List all environments:
+
+```bash
 uve list
+```
 
-# Activate an environment
+Activate an environment:
+
+```bash
 uve activate myenv
+```
 
-# Deactivate current environment
+Deactivate current environment:
+
+```bash
 uve deactivate
+```
 
-# Show version of uve you are running
+Show version of uve you are running:
+
+```base
 uve version
 ```
 
 ### Examples
 
-```bash
-# Create environment with Python 3.11
-uve create ml-project 3.11
+Create a new environment with Python 3.12:
 
-# List available environments
+```bash 
+uve create ai-stuff 3.12
+
+# output:
+Using CPython 3.12.8
+Created environment 'ai-stuff' at /home/rmcdermo/.uve/ai-stuff
+```
+
+List available environments:    
+
+```bash
 uve list
 
-# Activate environment
-uve activate ml-project
+# output:
+Available environments:
+  - ai-stuff
+  - base
+  - test123
+  - web-stuff
+```
 
-# Verify activation
+Activate an environment:
+
+```bash
+uve activate web-stuff
+
+# output:
+(web-stuff) rmcdermo:~/mycode/uve$
+```
+
+Verify activation
+
+```bash
 which python  # or `Get-Command python` on PowerShell
 
-# Install packages using UV's pip command
-uv pip install numpy pandas
-uv pip install torch tensorflow
-uv pip install -r requirements.txt  # Install from requirements file
+# output:
+/home/rmcdermo/.uve/web-stuff/bin/python
+```
 
-# View installed packages
+Install packages in the activated environment using UV's pip command
+
+```bash
+uv pip install numpy pandas
+
+# output:
+Using Python 3.11.11 environment at: .uve/web-stuff
+Resolved 6 packages in 763ms
+Prepared 3 packages in 1.31s
+Installed 6 packages in 239ms
+ + numpy==2.2.3
+ + pandas==2.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.1
+ + six==1.17.0
+ + tzdata==2025.1
+```
+
+View installed packages
+
+```bash
 uv pip list
 
-# Deactivate environment
+#output:
+Using Python 3.11.11 environment at: .uve/web-stuff
+Package         Version
+--------------- -----------
+numpy           2.2.3
+pandas          2.2.3
+python-dateutil 2.9.0.post0
+pytz            2025.1
+six             1.17.0
+tzdata          2025.1
+```
+
+Deactivate the current environment
+
+```bash
 uve deactivate
 ```
+
 ## Configuration
 
 Environments are stored in `~/.uve` by default. You can change this location by setting the `UVE_HOME` environment variable:
