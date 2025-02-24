@@ -72,10 +72,14 @@ echo 'source ~/.uve.sh' >> ~/.bashrc  # or ~/.zshrc on macOS
 PowerShell:
 ```powershell
 # Create PowerShell modules directory
-$modulesDir = "$env:USERPROFILE\Documents\PowerShell\Modules\uve"
+$modulesDir = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\uve"
 mkdir $modulesDir -ErrorAction SilentlyContinue
 # Copy PowerShell module
 cp uve.ps1 "$modulesDir\uve.psm1"
+
+# Unblock the follow and adjust the PowerShell security policy
+Unblock-File -Path "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\uve\uve.psm1"
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # Import the module (for current session)
 Import-Module uve
