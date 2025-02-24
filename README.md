@@ -13,8 +13,8 @@ UVE is a lightweight Python virtual environment manager that works with [UV](htt
 
 ## Prerequisites
 
-- [Go](https://golang.org/doc/install) - Optional, only needed if building from source
-- [UV](https://github.com/astral-sh/uv) - Installed
+- [Go](https://golang.org/doc/install)  - Optional, only needed if building from source
+- [UV](https://github.com/astral-sh/uv) - Installed and available in PATH
 
 ## Installation
 
@@ -66,7 +66,7 @@ Bash/Zsh:
 # Copy shell script
 cp uve.sh ~/.uve.sh
 # Add to shell config (choose appropriate file)
-echo 'source ~/.uve.sh' >> ~/.bashrc  # or ~/.zshrc
+echo 'source ~/.uve.sh' >> ~/.bashrc  # or ~/.zshrc on macOS
 ```
 
 PowerShell:
@@ -76,6 +76,18 @@ $modulesDir = "$env:USERPROFILE\Documents\PowerShell\Modules\uve"
 mkdir $modulesDir -ErrorAction SilentlyContinue
 # Copy PowerShell module
 cp uve.ps1 "$modulesDir\uve.psm1"
+
+# Import the module (for current session)
+Import-Module uve
+
+# Add auto-import to PowerShell profile (for future sessions)
+if (!(Test-Path $PROFILE)) {
+    New-Item -Type File -Path $PROFILE -Force
+}
+Add-Content $PROFILE "Import-Module uve"
+
+# Verify installation
+Get-Command uve
 ```
 
 ## Usage
@@ -125,13 +137,26 @@ uv pip list
 # Deactivate environment
 uve deactivate
 ```
-
 ## Configuration
 
 Environments are stored in `~/.uve` by default. You can change this location by setting the `UVE_HOME` environment variable:
 
 ```bash
 export UVE_HOME="/path/to/environments"
+```
+
+## Environment Structure
+
+By default, environments are created in `~/.uve/<env-name>` with the following structure:
+
+```
+~/.uve/
+├── env1/
+│   ├── bin/          # Scripts and executables
+│   ├── lib/          # Python packages
+│   └── pyvenv.cfg    # Environment configuration
+└── env2/
+    └── ...
 ```
 
 ## How It Works
@@ -146,16 +171,6 @@ When deactivating:
 
 1. Original PATH is restored
 2. Environment variables are cleaned up
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-
-## Credits
-
-- [UV](https://github.com/astral-sh/uv) - The underlying Python package installer
-- Inspired by conda's environment management approach
 
 ## Troubleshooting
 
@@ -183,10 +198,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - `VIRTUAL_ENV`: Set by activation (don't set manually)
 - `UVE_OLD_PATH`: Stores original PATH during activation
 
-## Roadmap
+## Contributing
 
-Future improvements under consideration:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- Environment removal command
-- Environment cloning
+## Credits
+
+- [UV](https://github.com/astral-sh/uv) - The underlying Python package installer
+- Inspired by conda's environment management approach
+
+
 
