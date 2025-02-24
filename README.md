@@ -81,7 +81,7 @@ mkdir $modulesDir -ErrorAction SilentlyContinue
 # Copy PowerShell module
 cp uve.ps1 "$modulesDir\uve.psm1"
 
-# Unblock the follow and adjust the PowerShell security policy
+# Unblock the file and adjust the PowerShell security policy
 Unblock-File -Path "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\uve\uve.psm1"
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
