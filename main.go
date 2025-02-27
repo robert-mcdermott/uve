@@ -12,7 +12,7 @@ import (
 
 // Version information
 const (
-	VERSION = "0.1.0"
+	VERSION = "0.1.1"
 )
 
 // Environment variables used by the virtual environment manager
@@ -123,6 +123,54 @@ func printVersion() {
 	fmt.Printf("uve version %s\n", VERSION)
 }
 
+// deleteEnv safely removes a virtual environment.
+// It checks if the environment exists and is a valid UVE environment before deletion.
+// Parameters:
+//   - name: name of the virtual environment to delete
+func deleteEnv(name string) {
+	uveHome := getUveHome()
+	envPath := filepath.Join(uveHome, name)
+
+	// Check if environment exists
+	if _, err := os.Stat(envPath); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Environment '%s' does not exist\n", name)
+		os.Exit(1)
+	}
+
+	// Safety check: ensure the path is within UVE_HOME
+	absUveHome, err := filepath.Abs(uveHome)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error resolving UVE_HOME path: %v\n", err)
+		os.Exit(1)
+	}
+
+	absEnvPath, err := filepath.Abs(envPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error resolving environment path: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Ensure the environment path is a subdirectory of UVE_HOME
+	if !filepath.HasPrefix(absEnvPath, absUveHome) {
+		fmt.Fprintf(os.Stderr, "Security error: Environment path is outside UVE_HOME\n")
+		os.Exit(1)
+	}
+
+	// Check if the environment is currently active
+	if os.Getenv(VIRTUAL_ENV_ENV) == envPath {
+		fmt.Fprintf(os.Stderr, "Error: Cannot delete active environment. Deactivate it first.\n")
+		os.Exit(1)
+	}
+
+	// Perform the deletion
+	if err := os.RemoveAll(envPath); err != nil {
+		fmt.Fprintf(os.Stderr, "Error deleting environment: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Deleted environment '%s'\n", name)
+}
+
 // printUsage prints the command-line usage instructions
 func printUsage() {
 	fmt.Printf(`Usage: uve <command> [args]
@@ -131,6 +179,7 @@ Commands:
   create <name> [python-version]  Create a new environment
   activate <name>                 Print activation script for environment
   deactivate                     Print deactivation script
+  delete <name>                  Delete an environment
   list                          List all environments
   version                       Show version information
 `)
@@ -192,6 +241,13 @@ func main() {
 
 	case "deactivate":
 		fmt.Print(generateDeactivateScript())
+
+	case "delete":
+		if len(os.Args) < 3 {
+			fmt.Println("Error: Environment name required")
+			os.Exit(1)
+		}
+		deleteEnv(os.Args[2])
 
 	case "list":
 		listEnvs()

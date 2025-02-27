@@ -22,6 +22,19 @@ uve() {
             # Restore original prompt
             export PS1="$UVE_OLD_PS1"
             ;;
+        "delete")
+            if [ -z "$2" ]; then
+                echo "Error: Environment name required"
+                return 1
+            fi
+            # Check if trying to delete the active environment
+            if [ -n "$VIRTUAL_ENV" ] && [ "$(basename "$VIRTUAL_ENV")" = "$2" ]; then
+                echo "Error: Cannot delete active environment. Deactivate it first."
+                return 1
+            fi
+            # Pass to the binary
+            uve-bin delete "$2"
+            ;;
         *)
             # Pass all other commands to the binary
             uve-bin "$@"

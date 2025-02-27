@@ -51,6 +51,22 @@ function uve {
                 Remove-Variable -Name UVE_ACTIVE_ENV -Scope Global -ErrorAction SilentlyContinue
             }
         }
+        "delete" {
+            if ($AllArgs.Count -lt 2) {
+                Write-Error "Error: Environment name required for 'delete'."
+                return
+            }
+            
+            $envName = $AllArgs[1]
+            # Check if trying to delete the active environment
+            if ($Global:UVE_ACTIVE_ENV -eq $envName) {
+                Write-Error "Error: Cannot delete active environment. Deactivate it first."
+                return
+            }
+            
+            # Pass to the binary
+            uve-bin delete $envName
+        }
         default {
             # Pass all arguments along to `uve-bin`
             uve-bin $AllArgs
