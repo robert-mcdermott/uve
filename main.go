@@ -88,10 +88,9 @@ func createEnv(name string, pythonVersion string) {
 // Returns activation script as string, with OS-specific syntax
 func generateActivateScript(envPath string) string {
 	if runtime.GOOS == "windows" {
-		return fmt.Sprintf(`@echo off
-set "UVE_OLD_PATH=%%PATH%%"
-set "VIRTUAL_ENV=%s"
-set "PATH=%s\Scripts;%%PATH%%"
+		return fmt.Sprintf(`$env:UVE_OLD_PATH = $env:PATH
+$env:VIRTUAL_ENV = "%s"
+$env:PATH = "%s\Scripts;" + $env:PATH
 `, envPath, envPath)
 	}
 	return fmt.Sprintf(`export UVE_OLD_PATH="$PATH"
@@ -105,12 +104,11 @@ export PATH="%s/bin:$PATH"
 // Returns deactivation script as string, with OS-specific syntax
 func generateDeactivateScript() string {
 	if runtime.GOOS == "windows" {
-		return `@echo off
-if defined UVE_OLD_PATH (
-    set "PATH=%UVE_OLD_PATH%"
-    set "UVE_OLD_PATH="
-)
-set "VIRTUAL_ENV="
+		return `if ($env:UVE_OLD_PATH) {
+    $env:PATH = $env:UVE_OLD_PATH
+    Remove-Item Env:\UVE_OLD_PATH
+}
+Remove-Item Env:\VIRTUAL_ENV -ErrorAction SilentlyContinue
 `
 	}
 	return `if [ -n "$UVE_OLD_PATH" ]; then
