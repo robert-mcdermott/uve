@@ -14,6 +14,7 @@ While I appreciate UV for its clean, per-project virtual environments, it's stil
 - Written in Go - no Python dependency for the manager itself
 - Simple shell integration for environment activation/deactivation
 - Uses UV for fast environment creation
+- Automatic shell detection and integration setup
 
 ## Prerequisites
 
@@ -63,39 +64,34 @@ cp uve-bin.exe "$env:USERPROFILE\bin\uve-bin.exe"
 )
 ```
 
-### Install shell integration:
+### Set up shell integration:
 
-Bash/Zsh:
+UVE now includes automatic shell integration. Simply run:
+
 ```bash
-# Copy shell script
-cp uve.sh ~/.uve.sh
-# Add to shell config (choose appropriate file)
-echo 'source ~/.uve.sh' >> ~/.bashrc  # or ~/.zshrc on macOS
+uve init
+```
+
+This will:
+- Detect your shell type (bash, zsh, or PowerShell)
+- Create the appropriate shell integration file
+- Update your shell configuration to load UVE automatically
+
+After running `uve init`, either restart your shell or source your shell configuration file to activate UVE:
+
+Bash:
+```bash
+source ~/.bashrc
+```
+
+Zsh:
+```bash
+source ~/.zshrc
 ```
 
 PowerShell:
 ```powershell
-# Create PowerShell modules directory
-$modulesDir = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\uve"
-mkdir $modulesDir -ErrorAction SilentlyContinue
-# Copy PowerShell module
-cp uve.ps1 "$modulesDir\uve.psm1"
-
-# Unblock the file and adjust the PowerShell security policy
-Unblock-File -Path "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\uve\uve.psm1"
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# Import the module (for current session)
 Import-Module uve
-
-# Add auto-import to PowerShell profile (for future sessions)
-if (!(Test-Path $PROFILE)) {
-    New-Item -Type File -Path $PROFILE -Force
-}
-Add-Content $PROFILE "Import-Module uve"
-
-# Verify installation
-Get-Command uve
 ```
 
 ## Usage
@@ -272,15 +268,15 @@ When deactivating:
 
 1. `command not found: uve`
    - Ensure the binary is in your PATH
+   - Run `uve init` to set up shell integration
    - Restart your terminal or source your shell config
 
 2. Activation not working
-   - For bash/zsh: Make sure you sourced `~/.uve.sh`
-   - For PowerShell: Ensure you imported the module
+   - Make sure you've run `uve init` and restarted your shell
+   - For PowerShell: Run `Import-Module uve` in the current session
 
 3. UV not found
    - Install [UV](https://github.com/astral-sh/uv)
-
 
 4. Package installation errors
    - Make sure you've activated the environment first
