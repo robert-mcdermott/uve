@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Configuration
-VERSION="0.1.2"
+VERSION="0.1.3"
 PACKAGE="main.go"
 BINARY_NAME="uve-bin"
 PLATFORMS=("windows/amd64" "linux/amd64" "darwin/amd64" "darwin/arm64")
