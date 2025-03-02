@@ -30,13 +30,13 @@ If you are building it yourself, clone the repo and build the binary:
 ```bash
 git clone https://github.com/robert-mcdermott/uve.git
 cd uve
-go build -ldflags="-s -w" -o uve-bin uve
+go build -ldflags="-s -w" -o uve-bin main.go
 ```
 
 ### Installation from pre-built binary:
 
-If you've rather just use a pre-built binary, download the binary archive for your platform (os and architecture) from the [releases page](https://github.com/robert-mcdermott/uve/releases)
-and extract the archive to a directory of your choice. Unless you have a reason to select a specific release, choose the latest release. After you have extracted the archive, open a shell in that folder and follow the instructions for your platform below:
+If you'd rather just use a pre-built binary, download the archive for your platform (OS and architecture) from the [releases page](https://github.com/robert-mcdermott/uve/releases)
+and extract the archive to a directory of your choice. Unless you have a reason to select a specific release, choose the latest release.
 
 ### Install the binary:
 
@@ -68,13 +68,13 @@ Unblock-File -Path "$env:USERPROFILE\bin\uve-bin.exe"
 
 ### Set up shell integration:
 
-UVE now includes automatic shell integration. Simply run:
+UVE includes automatic shell integration with all shell scripts embedded in the binary. Simply run:
 
 ```bash
 uve-bin init
 ```
 
-#### *Note: running 'uve-bin' should only be used for the inital shell integration when first installing uve, after shell integration is complete, you'll only use the 'uve' command for all other operations*
+#### *Note: running 'uve-bin' should only be used for the initial shell integration when first installing uve, after shell integration is complete, you'll only use the 'uve' command for all other operations*
 
 This will:
 - Detect your shell type (bash, zsh, or PowerShell)
