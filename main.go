@@ -14,7 +14,7 @@ import (
 
 // Version information
 const (
-	VERSION = "0.1.2"
+	VERSION = "0.1.3"
 )
 
 // Embed the shell integration scripts into the binary at compile time
