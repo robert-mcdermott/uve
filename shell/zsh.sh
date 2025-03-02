@@ -43,7 +43,9 @@ uve() {
 }
 
 # Check if the script is being sourced
-if [[ "${(%):-%x}" == "${0}" ]]; then
+if [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]; then
+    : # Script is being sourced, do nothing
+else
     echo "This script must be sourced. Use:"
     echo "  source ~/.uve.sh"
     exit 1
