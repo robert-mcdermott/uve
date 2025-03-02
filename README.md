@@ -30,7 +30,7 @@ If you are building it yourself, clone the repo and build the binary:
 ```bash
 git clone https://github.com/robert-mcdermott/uve.git
 cd uve
-go build -o uve-bin main.go
+go build -ldflags="-s -w" -o uve-bin uve
 ```
 
 ### Installation from pre-built binary:
@@ -71,15 +71,17 @@ Unblock-File -Path "$env:USERPROFILE\bin\uve-bin.exe"
 UVE now includes automatic shell integration. Simply run:
 
 ```bash
-uve init
+uve-bin init
 ```
+
+#### *Note: running 'uve-bin' should only be used for the inital shell integration when first installing uve, after shell integration is complete, you'll only use the 'uve' command for all other operations*
 
 This will:
 - Detect your shell type (bash, zsh, or PowerShell)
 - Create the appropriate shell integration file
 - Update your shell configuration to load UVE automatically
 
-After running `uve init`, either restart your shell or source your shell configuration file to activate UVE:
+After running `uve-bin init`, either restart your shell or source your shell configuration file to activate UVE:
 
 Bash:
 ```bash
