@@ -272,11 +272,11 @@ When deactivating:
 
 1. `command not found: uve`
    - Ensure the binary is in your PATH
-   - Run `uve init` to set up shell integration
+   - Run `uve-bin init` to set up shell integration
    - Restart your terminal or source your shell config
 
 2. Activation not working
-   - Make sure you've run `uve init` and restarted your shell
+   - Make sure you've run `uve-bin init` and restarted your shell
    - For PowerShell: Run `Import-Module uve` in the current session
 
 3. UV not found
