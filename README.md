@@ -36,7 +36,7 @@ go build -o uve-bin main.go
 ### Installation from pre-built binary:
 
 If you've rather just use a pre-built binary, download the binary archive for your platform (os and architecture) from the [releases page](https://github.com/robert-mcdermott/uve/releases)
-and extract the archive to a directory of your choice.
+and extract the archive to a directory of your choice. Unless you have a reason to select a specific release, choose the latest release. After you have extracted the archive, open a shell in that folder and follow the instructions for your platform below:
 
 ### Install the binary:
 
@@ -50,13 +50,15 @@ cp uve-bin ~/bin/uve-bin
 export PATH="$HOME/bin:$PATH"
 ```
 
-Windows (PowerShell Admin):
+Windows (PowerShell):
 ```powershell
 # Create directory for binary
 mkdir "$env:USERPROFILE\bin" -ErrorAction SilentlyContinue
-# Copy binary as uve-bin
+# Copy the uve-bin.exe binary to your profile
 cp uve-bin.exe "$env:USERPROFILE\bin\uve-bin.exe"
-# Add to PATH (permanent)
+# Remove the MOTW flag from the file 
+Unblock-File -Path "$env:USERPROFILE\bin\uve-bin.exe"
+# Add to PATH (permanent, user level)
 [Environment]::SetEnvironmentVariable(
     "Path",
     [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:USERPROFILE\bin",

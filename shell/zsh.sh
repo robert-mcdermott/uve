@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Store the original prompt if not already stored
 if [ -z "$UVE_OLD_PS1" ]; then
@@ -43,8 +43,8 @@ uve() {
 }
 
 # Check if the script is being sourced
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${(%):-%x}" == "${0}" ]]; then
     echo "This script must be sourced. Use:"
-    echo "  source uve.sh"
+    echo "  source ~/.uve.sh"
     exit 1
 fi 

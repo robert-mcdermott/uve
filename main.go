@@ -3,6 +3,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,8 +14,20 @@ import (
 
 // Version information
 const (
-	VERSION = "0.1.1"
+	VERSION = "0.1.2"
 )
+
+// Embed the shell integration scripts into the binary at compile time
+// so the binary can still be distributed stand-alone
+
+//go:embed shell/bash.sh
+var bashIntegration string
+
+//go:embed shell/zsh.sh
+var zshIntegration string
+
+//go:embed shell/powershell.psm1
+var powershellModule string
 
 // Environment variables used by the virtual environment manager
 const (
@@ -24,193 +37,6 @@ const (
 	OLD_PATH_ENV     = "UVE_OLD_PATH" // Backup of PATH before activation
 	SHELL_ENV        = "SHELL"        // User's shell
 	DEFAULT_UVE_HOME = ".uve"         // Default directory name for storing environments
-)
-
-// Shell integration scripts embedded in the binary
-const (
-	// Bash/Zsh shell integration script
-	BASH_INTEGRATION = `#!/bin/bash
-
-# Store the original prompt if not already stored
-if [ -z "$UVE_OLD_PS1" ]; then
-    export UVE_OLD_PS1="$PS1"
-fi
-
-# Main uve command function
-uve() {
-    case "$1" in
-        "activate")
-            if [ -z "$2" ]; then
-                echo "Error: Environment name required"
-                return 1
-            fi
-            eval "$(uve-bin activate "$2")"
-            # Update prompt to show environment name
-            export PS1="($2) $UVE_OLD_PS1"
-            ;;
-        "deactivate")
-            eval "$(uve-bin deactivate)"
-            # Restore original prompt
-            export PS1="$UVE_OLD_PS1"
-            ;;
-        "delete")
-            if [ -z "$2" ]; then
-                echo "Error: Environment name required"
-                return 1
-            fi
-            # Check if trying to delete the active environment
-            if [ -n "$VIRTUAL_ENV" ] && [ "$(basename "$VIRTUAL_ENV")" = "$2" ]; then
-                echo "Error: Cannot delete active environment. Deactivate it first."
-                return 1
-            fi
-            # Pass to the binary
-            uve-bin delete "$2"
-            ;;
-        *)
-            # Pass all other commands to the binary
-            uve-bin "$@"
-            ;;
-    esac
-}
-
-# Check if the script is being sourced
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    echo "This script must be sourced. Use:"
-    echo "  source ~/.uve.sh"
-    exit 1
-fi`
-
-	// PowerShell module script
-	POWERSHELL_MODULE = `# If the original prompt function isn't stored, store it now
-if (-not (Test-Path Variable:UVE_OLD_PROMPT)) {
-    $Global:UVE_OLD_PROMPT = $function:prompt
-}
-
-function uve {
-    [CmdletBinding()]
-    param(
-        # Capture all arguments into an array
-        [Parameter(ValueFromRemainingArguments=$true)]
-        [string[]] $AllArgs
-    )
-
-    # If no arguments were provided, just call uve-bin with no args
-    if (-not $AllArgs) {
-        uve-bin
-        return
-    }
-
-    switch ($AllArgs[0]) {
-        "activate" {
-            if ($AllArgs.Count -lt 2) {
-                Write-Error "Error: Environment name required for 'activate'."
-                return
-            }
-
-            $envName = $AllArgs[1]
-            # Call uve-bin activate <envName>, capture output as a single string
-            $activateScript = uve-bin activate $envName | Out-String
-
-            if ($LASTEXITCODE -eq 0) {
-                # Invoke the single string script to modify the session
-                Invoke-Expression $activateScript
-
-                # Update prompt to show the active environment
-                $Global:UVE_ACTIVE_ENV = $envName
-                $function:prompt = {
-                    "($Global:UVE_ACTIVE_ENV) $($Global:UVE_OLD_PROMPT.InvokeReturnAsIs())"
-                }
-            }
-        }
-        "deactivate" {
-            # Call uve-bin deactivate, also capture as a single string
-            $deactivateScript = uve-bin deactivate | Out-String
-
-            if ($LASTEXITCODE -eq 0) {
-                Invoke-Expression $deactivateScript
-
-                # Restore original prompt
-                $function:prompt = $Global:UVE_OLD_PROMPT
-                Remove-Variable -Name UVE_ACTIVE_ENV -Scope Global -ErrorAction SilentlyContinue
-            }
-        }
-        "delete" {
-            if ($AllArgs.Count -lt 2) {
-                Write-Error "Error: Environment name required for 'delete'."
-                return
-            }
-            
-            $envName = $AllArgs[1]
-            # Check if trying to delete the active environment
-            if ($Global:UVE_ACTIVE_ENV -eq $envName) {
-                Write-Error "Error: Cannot delete active environment. Deactivate it first."
-                return
-            }
-            
-            # Pass to the binary
-            uve-bin delete $envName
-        }
-        default {
-            # Pass all arguments along to uve-bin
-            uve-bin $AllArgs
-        }
-    }
-}
-
-# Export the function so it's visible as a module command
-Export-ModuleMember -Function uve`
-
-	// ZSH specific integration (if needed beyond bash)
-	ZSH_INTEGRATION = `#!/bin/zsh
-
-# Store the original prompt if not already stored
-if [ -z "$UVE_OLD_PS1" ]; then
-    export UVE_OLD_PS1="$PS1"
-fi
-
-# Main uve command function
-uve() {
-    case "$1" in
-        "activate")
-            if [ -z "$2" ]; then
-                echo "Error: Environment name required"
-                return 1
-            fi
-            eval "$(uve-bin activate "$2")"
-            # Update prompt to show environment name
-            export PS1="($2) $UVE_OLD_PS1"
-            ;;
-        "deactivate")
-            eval "$(uve-bin deactivate)"
-            # Restore original prompt
-            export PS1="$UVE_OLD_PS1"
-            ;;
-        "delete")
-            if [ -z "$2" ]; then
-                echo "Error: Environment name required"
-                return 1
-            fi
-            # Check if trying to delete the active environment
-            if [ -n "$VIRTUAL_ENV" ] && [ "$(basename "$VIRTUAL_ENV")" = "$2" ]; then
-                echo "Error: Cannot delete active environment. Deactivate it first."
-                return 1
-            fi
-            # Pass to the binary
-            uve-bin delete "$2"
-            ;;
-        *)
-            # Pass all other commands to the binary
-            uve-bin "$@"
-            ;;
-    esac
-}
-
-# Check if the script is being sourced
-if [[ "${(%):-%x}" == "${0}" ]]; then
-    echo "This script must be sourced. Use:"
-    echo "  source ~/.uve.sh"
-    exit 1
-fi`
 )
 
 // getUveHome returns the path where virtual environments are stored.
@@ -410,7 +236,7 @@ func initShellIntegration() {
 func setupBashIntegration(homeDir string) {
 	// Write the integration script
 	scriptPath := filepath.Join(homeDir, ".uve.sh")
-	err := os.WriteFile(scriptPath, []byte(BASH_INTEGRATION), 0644)
+	err := os.WriteFile(scriptPath, []byte(bashIntegration), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing shell integration file: %v\n", err)
 		os.Exit(1)
@@ -448,7 +274,7 @@ func setupBashIntegration(homeDir string) {
 func setupZshIntegration(homeDir string) {
 	// Write the integration script
 	scriptPath := filepath.Join(homeDir, ".uve.sh")
-	err := os.WriteFile(scriptPath, []byte(ZSH_INTEGRATION), 0644)
+	err := os.WriteFile(scriptPath, []byte(zshIntegration), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing shell integration file: %v\n", err)
 		os.Exit(1)
@@ -494,7 +320,7 @@ func setupPowerShellIntegration(homeDir string) {
 
 	// Write the module file
 	modulePath := filepath.Join(modulesDir, "uve.psm1")
-	err = os.WriteFile(modulePath, []byte(POWERSHELL_MODULE), 0644)
+	err = os.WriteFile(modulePath, []byte(powershellModule), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing PowerShell module file: %v\n", err)
 		os.Exit(1)
