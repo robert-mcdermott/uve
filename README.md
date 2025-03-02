@@ -50,6 +50,16 @@ cp uve-bin ~/bin/uve-bin
 export PATH="$HOME/bin:$PATH"
 ```
 
+#### Note for macOS Users:
+When running `uve-bin` for the first time on macOS, you may see a security warning as the binary is not signed with an Apple developer certificate. To resolve this:
+
+1. When you first try to run `uve-bin`, macOS will block it
+2. Open System Settings (Apple menu  > System Settings)
+3. Click on Privacy & Security
+4. Scroll down to the Security section where you'll see a message about `uve-bin` being blocked
+5. Click "Allow Anyway" to permit the execution
+6. The next time you run `uve-bin`, you may need to click "Open" in a security dialog to confirm
+
 Windows (PowerShell):
 ```powershell
 # Create directory for binary
