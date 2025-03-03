@@ -1,0 +1,53 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (vendor directories might be copied into subdirectories; examples are given for a vendor dir in the project root)
+vendor/
+
+# Go module files
+
+# IDE/editor files
+*.idea/
+*.vscode/
+*.vs/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*.swn
+
+# Build artifacts
+bin/
+build/
+*.o
+*.a
+*.gcda
+*.gcno
+*.gcov
+
+# Compiled shared objects
+*.so
+
+# C/C++ object files
+*.obj
+
+# Coverage files
+cover.out
+
+# The `dist` directory and all its contents
+dist/
+
+.DS_Store
