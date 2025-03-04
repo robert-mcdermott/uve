@@ -6,9 +6,6 @@ PACKAGE="main.go"
 BINARY_NAME="uve-bin"
 PLATFORMS=("windows/amd64" "linux/amd64" "darwin/amd64" "darwin/arm64")
 
-# Ensure we're in the project root directory
-cd "$(dirname "$0")/.." || exit 1
-
 echo "=== Building UVE v${VERSION} ==="
 
 # Compile for all platforms
