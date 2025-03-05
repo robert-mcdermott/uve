@@ -14,7 +14,7 @@ import (
 
 // Version information
 const (
-	VERSION = "0.1.3"
+	VERSION = "0.1.4"
 )
 
 // Embed the shell integration scripts into the binary at compile time
@@ -310,11 +310,41 @@ func setupZshIntegration(homeDir string) {
 
 // setupPowerShellIntegration sets up integration for PowerShell
 func setupPowerShellIntegration(homeDir string) {
-	// Create PowerShell modules directory
-	modulesDir := filepath.Join(homeDir, "Documents", "WindowsPowerShell", "Modules", "uve")
-	err := os.MkdirAll(modulesDir, 0755)
+	// Get the correct profile path by asking PowerShell itself
+	// We use Split-Path to get just the directory, then append the standard profile name
+	profilePathCmd := exec.Command("powershell", "-NoProfile", "-Command",
+		"$profileDir = Split-Path $PROFILE; Write-Output (Join-Path $profileDir 'Microsoft.PowerShell_profile.ps1')")
+	profilePathBytes, err := profilePathCmd.Output()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating PowerShell modules directory: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error getting PowerShell profile path: %v\n", err)
+		// Fall back to default path
+		profilePathBytes = []byte(filepath.Join(homeDir, "Documents", "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1"))
+	}
+	profilePath := strings.TrimSpace(string(profilePathBytes))
+	profileDir := filepath.Dir(profilePath)
+
+	// Get the correct module path by asking PowerShell for PSModulePath
+	modulePathCmd := exec.Command("powershell", "-NoProfile", "-Command",
+		"Write-Output ($env:PSModulePath -split ';' | Where-Object { $_ -like \"*$env:USERPROFILE*\" } | Select-Object -First 1)")
+	modulePathBytes, err := modulePathCmd.Output()
+	var modulesRoot string
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error getting PowerShell module path: %v\n", err)
+		// Fall back to using the same directory as the profile
+		modulesRoot = filepath.Join(profileDir, "Modules")
+	} else {
+		modulesRoot = strings.TrimSpace(string(modulePathBytes))
+		// If we didn't get a path (perhaps no user module path exists yet), fall back
+		if modulesRoot == "" {
+			modulesRoot = filepath.Join(profileDir, "Modules")
+		}
+	}
+
+	// Create PowerShell modules directory
+	modulesDir := filepath.Join(modulesRoot, "uve")
+	err = os.MkdirAll(modulesDir, 0755)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating PowerShell modules directory at %s: %v\n", modulesDir, err)
 		os.Exit(1)
 	}
 
@@ -325,10 +355,6 @@ func setupPowerShellIntegration(homeDir string) {
 		fmt.Fprintf(os.Stderr, "Error writing PowerShell module file: %v\n", err)
 		os.Exit(1)
 	}
-
-	// Create or update PowerShell profile
-	profileDir := filepath.Join(homeDir, "Documents", "WindowsPowerShell")
-	profilePath := filepath.Join(profileDir, "Microsoft.PowerShell_profile.ps1")
 
 	// Ensure profile directory exists
 	err = os.MkdirAll(profileDir, 0755)
@@ -343,6 +369,7 @@ func setupPowerShellIntegration(homeDir string) {
 	if err == nil {
 		if strings.Contains(string(profileContent), "Import-Module uve") {
 			fmt.Println("PowerShell integration already set up in profile")
+			fmt.Printf("Profile location: %s\n", profilePath)
 			fmt.Println("To use UVE in the current session, run: Import-Module uve")
 			return
 		}
@@ -363,6 +390,8 @@ func setupPowerShellIntegration(homeDir string) {
 	}
 
 	fmt.Println("PowerShell integration set up successfully.")
+	fmt.Printf("Profile location: %s\n", profilePath)
+	fmt.Printf("Module location: %s\n", modulesDir)
 	fmt.Println("To use UVE in the current session, run: Import-Module uve")
 	fmt.Println("UVE will be automatically available in new PowerShell sessions.")
 }
