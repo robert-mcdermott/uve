@@ -2,7 +2,7 @@
 
 ## Overview
 
-UVE 0.1.2 introduces significant improvements to the codebase structure and distribution process, making the tool more maintainable and easier to distribute. This release focuses on technical improvements while maintaining full compatibility with previous versions.
+UVE 0.1.4 introduces significant improvements to the codebase structure and distribution process, making the tool more maintainable and easier to distribute. This release focuses on technical improvements while maintaining full compatibility with previous versions.
 
 ## What's New
 
