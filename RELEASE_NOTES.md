@@ -1,4 +1,4 @@
-# UVE 0.1.2 Release Notes
+# UVE 0.1.4 Release Notes
 
 ## Overview
 
@@ -18,11 +18,11 @@ UVE 0.1.2 introduces significant improvements to the codebase structure and dist
 
 ## Compatibility
 
-UVE 0.1.2 is fully compatible with previous versions. No changes to existing environments or workflows are required.
+UVE 0.1.4 is fully compatible with previous versions. No changes to existing environments or workflows are required.
 
 ## Installation
 
-Download the appropriate package for your platform from the [releases page](https://github.com/robert-mcdermott/uve/releases/tag/v0.1.2), extract it, and follow the installation instructions in the README.
+Download the appropriate package for your platform from the [releases page](https://github.com/robert-mcdermott/uve/releases/tag/0.1.4), extract it, and follow the installation instructions in the README.
 
 ### Quick Installation Steps
 
