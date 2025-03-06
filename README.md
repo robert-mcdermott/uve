@@ -4,7 +4,7 @@ UVE is a lightweight Python virtual environment manager that works with [UV](htt
 
 ## Why?
 
-While I appreciate UV for its clean, per-project virtual environments, it's still convenient at times to have long-lived, general-purpose conda style environments that you can activate from anywhere that aren't tied to an organized project, for general purpose hacking. Since I've completely switched from conda to UV, I created this companion utility to replicate conda-like workflows when needed—giving me the best of both worlds.
+While I appreciate UV for its clean, per-project virtual environments, it's still convenient at times to have long-lived, general-purpose conda style environments that you can activate from anywhere that aren't tied to an organized project, for general purpose hacking. Since I've completely switched from conda to UV, I created this companion utility to replicate conda-like workflows when needed—giving me the best of both worlds. Why don't I just use Anaconda/conda? See my article [Saying Goodbye to Anaconda](https://robert-mcdermott.medium.com/saying-goodbye-to-anaconda-91c18ddf89bb)
 
 ## Features
 
