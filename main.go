@@ -110,8 +110,9 @@ $env:PATH = "%s\Scripts;" + $env:PATH
 	}
 	return fmt.Sprintf(`export UVE_OLD_PATH="$PATH"
 export VIRTUAL_ENV="%s"
+export UV_PROJECT_ENVIRONMENT="%s"
 export PATH="%s/bin:$PATH"
-`, envPath, envPath)
+`, envPath, envPath, envPath)
 }
 
 // generateDeactivateScript generates a shell script to deactivate the current virtual environment.
