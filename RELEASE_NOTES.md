@@ -10,7 +10,7 @@ UVE 0.1.4 introduces significant improvements to the codebase structure and dist
 - **Automatic Shell Detection**: UVE now automatically detects whether you're using Bash, Zsh, or PowerShell and configures the appropriate integration.
 - **Simplified Setup Process**: The entire installation process is now just: download, place in PATH, run `uve-bin init`, and you're ready to go.
 - **Self-contained Binary**: Shell integration scripts are now embedded directly into the binary using Go's embed directive, eliminating the need for separate script files during installation.
-- **Simplified Installation**: The new "init" shell interation automatically creates the shell scripts and sets up shell integration for you.
+- **Simplified Installation**: The new "init" shell interaction automatically creates the shell scripts and sets up shell integration for you.
 - **SHA256 Checksums**: Added SHA256 checksums for all distribution packages to enhance security.
 - **Improved Documentation**: Updated installation instructions to reflect the new self-contained binary approach.
 - **Mark of the Web Handling**: Added explicit instructions to unblock downloaded executables on Windows using `Unblock-File`.
