@@ -3,7 +3,7 @@
 # UVE Installer
 set -euo pipefail
 
-BASE_URL="https://github.com/your-org/uve/releases/latest/download"
+BASE_URL="https://github.com/iamshreeram/uve/releases/latest/download"
 TEMP_DIR=$(mktemp -d)
 
 # Detect OS and Architecture
