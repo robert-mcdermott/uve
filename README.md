@@ -76,6 +76,13 @@ Unblock-File -Path "$env:USERPROFILE\bin\uve-bin.exe"
 )
 ```
 
+## New Environment Behavior
+
+When creating a new environment:
+- A minimal Python environment is created
+- `uv` and `pip` are automatically installed into the environment
+- This ensures you can use both tools immediately after activation
+
 ### Set up shell integration:
 
 UVE includes automatic shell integration with all shell scripts embedded in the binary. Simply run:
