@@ -29,6 +29,9 @@ var zshIntegration string
 //go:embed shell/powershell.psm1
 var powershellModule string
 
+//go:embed shell/fish.fish
+var fishIntegration string
+
 // Environment variables used by the virtual environment manager
 const (
 	UVE_HOME_ENV     = "UVE_HOME"     // Directory where virtual environments are stored
@@ -102,7 +105,15 @@ func createEnv(name string, pythonVersion string) {
 //
 // Returns activation script as string, with OS-specific syntax
 func generateActivateScript(envPath string) string {
-	if runtime.GOOS == "windows" {
+	shell := detectShell()
+
+	if shell == "fish" {
+		return fmt.Sprintf(`set -gx UVE_OLD_PATH "$PATH"
+set -gx VIRTUAL_ENV "%s"
+set -gx UV_PROJECT_ENVIRONMENT "%s"
+set -gx PATH "%s/bin" $PATH
+`, envPath, envPath, envPath)
+	} else if runtime.GOOS == "windows" {
 		return fmt.Sprintf(`$env:UVE_OLD_PATH = $env:PATH
 $env:VIRTUAL_ENV = "%s"
 $env:PATH = "%s\Scripts;" + $env:PATH
@@ -119,7 +130,16 @@ export PATH="%s/bin:$PATH"
 // The script restores the original PATH and unsets environment variables.
 // Returns deactivation script as string, with OS-specific syntax
 func generateDeactivateScript() string {
-	if runtime.GOOS == "windows" {
+	shell := detectShell()
+
+	if shell == "fish" {
+		return `if set -q UVE_OLD_PATH
+    set -gx PATH "$UVE_OLD_PATH"
+    set -e UVE_OLD_PATH
+end
+set -e VIRTUAL_ENV
+`
+	} else if runtime.GOOS == "windows" {
 		return `if ($env:UVE_OLD_PATH) {
     $env:PATH = $env:UVE_OLD_PATH
     Remove-Item Env:\UVE_OLD_PATH
@@ -194,20 +214,17 @@ func detectShell() string {
 		return "powershell"
 	}
 
-	// On macOS, default to zsh (since Catalina)
-	if runtime.GOOS == "darwin" {
-		return "zsh"
-	}
-
-	// Try to get the shell from environment variable
 	shell := os.Getenv(SHELL_ENV)
 	if shell != "" {
-		// Extract the shell name from the path
 		shellName := filepath.Base(shell)
-		return shellName
+		if strings.Contains(shellName, "fish") {
+			return "fish"
+		}
+		if strings.Contains(shellName, "zsh") {
+			return "zsh"
+		}
 	}
 
-	// Default to bash if we can't determine
 	return "bash"
 }
 
@@ -227,6 +244,8 @@ func initShellIntegration() {
 		setupZshIntegration(homeDir)
 	case "bash", "sh":
 		setupBashIntegration(homeDir)
+	case "fish":
+		setupFishIntegration(homeDir)
 	default:
 		fmt.Printf("Unsupported shell: %s. Using bash integration.\n", shell)
 		setupBashIntegration(homeDir)
@@ -395,6 +414,51 @@ func setupPowerShellIntegration(homeDir string) {
 	fmt.Printf("Module location: %s\n", modulesDir)
 	fmt.Println("To use UVE in the current session, run: Import-Module uve")
 	fmt.Println("UVE will be automatically available in new PowerShell sessions.")
+}
+
+// setupFishIntegration sets up integration for Fish shell
+func setupFishIntegration(homeDir string) {
+	// Create fish config directory if it doesn't exist
+	fishConfigDir := filepath.Join(homeDir, ".config", "fish")
+	if err := os.MkdirAll(fishConfigDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating fish config directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Write the integration script
+	scriptPath := filepath.Join(fishConfigDir, "uve.fish")
+	err := os.WriteFile(scriptPath, []byte(fishIntegration), 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing fish integration file: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Check if integration is already in config.fish
+	configPath := filepath.Join(fishConfigDir, "config.fish")
+	configContent, err := os.ReadFile(configPath)
+	if err == nil {
+		if strings.Contains(string(configContent), "source ~/.config/fish/uve.fish") {
+			fmt.Println("Fish shell integration already set up in config.fish")
+			return
+		}
+	}
+
+	// Add source command to config.fish
+	f, err := os.OpenFile(configPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error opening config.fish: %v\n", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	_, err = f.WriteString("\n# UVE shell integration\nsource ~/.config/fish/uve.fish\n")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error updating config.fish: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Fish shell integration set up successfully.")
+	fmt.Println("Please restart your shell or run 'source ~/.config/fish/uve.fish' to activate.")
 }
 
 // printUsage prints the command-line usage instructions
