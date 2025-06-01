@@ -108,11 +108,7 @@ func generateActivateScript(envPath string) string {
 	shell := detectShell()
 
 	if shell == "fish" {
-		return fmt.Sprintf(`set -gx UVE_OLD_PATH "$PATH"
-set -gx VIRTUAL_ENV "%s"
-set -gx UV_PROJECT_ENVIRONMENT "%s"
-set -gx PATH "%s/bin" $PATH
-`, envPath, envPath, envPath)
+		return fmt.Sprintf(`set -gx UVE_OLD_PATH "$PATH"; set -gx VIRTUAL_ENV "%s"; set -gx UV_PROJECT_ENVIRONMENT "%s"; set -gx PATH "%s/bin" $PATH;`, envPath, envPath, envPath)
 	} else if runtime.GOOS == "windows" {
 		return fmt.Sprintf(`$env:UVE_OLD_PATH = $env:PATH
 $env:VIRTUAL_ENV = "%s"
@@ -133,12 +129,7 @@ func generateDeactivateScript() string {
 	shell := detectShell()
 
 	if shell == "fish" {
-		return `if set -q UVE_OLD_PATH
-    set -gx PATH "$UVE_OLD_PATH"
-    set -e UVE_OLD_PATH
-end
-set -e VIRTUAL_ENV
-`
+		return `if set -q UVE_OLD_PATH; set -gx PATH "$UVE_OLD_PATH"; set -e UVE_OLD_PATH; end; set -e VIRTUAL_ENV; set -e UV_PROJECT_ENVIRONMENT;`
 	} else if runtime.GOOS == "windows" {
 		return `if ($env:UVE_OLD_PATH) {
     $env:PATH = $env:UVE_OLD_PATH

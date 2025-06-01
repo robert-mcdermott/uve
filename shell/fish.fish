@@ -8,23 +8,38 @@ function uve
                 return 1
             end
             
-            set env_name $argv[2]
-            set activate_script (uve-bin activate $env_name)
-            eval $activate_script
+            if not test -d "$HOME/.uve/$argv[2]"
+                echo "Environment '$argv[2]' does not exist"
+                return 1
+            end
+
+            # Evaluate the activation commands directly
+            eval (uve-bin activate $argv[2])
             
-            # Update prompt to show environment name
-            function fish_prompt
-                echo -n "($env_name) "
-                __fish_print_prompt
+            # Only modify prompt if activation succeeded
+            if set -q VIRTUAL_ENV
+                # Use the explicitly provided environment name ($argv[2]) instead of basename
+                set -g __uve_env_name $argv[2]
+                functions -c fish_prompt __fish_original_prompt
+                function fish_prompt
+                    echo -n "($__uve_env_name) "
+                    __fish_original_prompt
+                end
             end
             
         case "deactivate"
-            set deactivate_script (uve-bin deactivate)
-            eval $deactivate_script
+            # Evaluate the deactivation commands directly
+            eval (uve-bin deactivate)
             
-            # Restore original prompt
-            functions -e fish_prompt
-            
+            # Restore original prompt if it was changed
+            if functions -q __fish_original_prompt
+                functions -e fish_prompt
+                functions -c __fish_original_prompt fish_prompt
+                functions -e __fish_original_prompt
+            end
+            set -e __uve_env_name  # Clean up our global variable
+                
+        
         case "delete"
             if test (count $argv) -lt 2
                 echo "Error: Environment name required"
