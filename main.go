@@ -71,7 +71,7 @@ func ensureUveHome() string {
 // Parameters:
 //   - name: name of the virtual environment
 //   - pythonVersion: optional Python version to use (empty string for default)
-func createEnv(name string, pythonVersion string) {
+func createEnv(name string, pythonVersion string, skipBootstrap bool) {
 	uveHome := ensureUveHome()
 	envPath := filepath.Join(uveHome, name)
 
@@ -80,6 +80,7 @@ func createEnv(name string, pythonVersion string) {
 		os.Exit(1)
 	}
 
+	// Create the basic environment
 	args := []string{"venv"}
 	if pythonVersion != "" {
 		args = append(args, "--python", pythonVersion)
@@ -93,6 +94,29 @@ func createEnv(name string, pythonVersion string) {
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating environment: %v\n", err)
 		os.Exit(1)
+	}
+
+	if !skipBootstrap {
+		// Install uv and pip into the new environment
+		fmt.Println("Installing uv and pip in the new environment...")
+		installCmd := exec.Command("uv", "pip", "install", "--python", filepath.Join(envPath, "bin", "python"), "uv", "pip")
+		if runtime.GOOS == "windows" {
+			installCmd = exec.Command("uv", "pip", "install", "--python", filepath.Join(envPath, "Scripts", "python.exe"), "uv", "pip")
+		}
+		installCmd.Stdout = os.Stdout
+		installCmd.Stderr = os.Stderr
+
+		if err := installCmd.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Failed to install uv and pip in new environment: %v\n", err)
+			fmt.Fprintf(os.Stderr, "You can manually install them later with: uv pip install --python %s uv pip\n",
+				filepath.Join(envPath, "bin", "python"))
+		}
+	}
+
+	// Check uv is available in the new environment
+	checkCmd := exec.Command(filepath.Join(envPath, "bin", "uv"), "--version")
+	if err := checkCmd.Run(); err == nil {
+		fmt.Println("Successfully installed uv in the environment")
 	}
 
 	fmt.Printf("Created environment '%s' at %s\n", name, envPath)
@@ -507,7 +531,7 @@ func main() {
 		if len(os.Args) > 3 {
 			pythonVersion = os.Args[3]
 		}
-		createEnv(os.Args[2], pythonVersion)
+		createEnv(os.Args[2], pythonVersion, false)
 
 	case "activate":
 		if len(os.Args) < 3 {
