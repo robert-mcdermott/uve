@@ -2,25 +2,59 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    tags:
+      - 'v*'  # Matches tags like v1.0.0, v2.3.4, etc.
+
+permissions:
+  contents: write  # Needed to create releases
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          fetch-depth: 0  # Needed for version detection
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      
-      - name: Build and Package
+
+      - name: Build binaries
         run: |
-          chmod +x package-release.sh
-          ./package-release.sh
+          mkdir -p dist
+          GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/uve-linux-amd64
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/uve-darwin-amd64 
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/uve-darwin-arm64
+          GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/uve-windows-amd64.exe
+
+      - name: Package release assets
+        run: |
+          cd dist
+          tar czf uve-linux-amd64.tar.gz uve-linux-amd64
+          tar czf uve-darwin-amd64.tar.gz uve-darwin-amd64
+          tar czf uve-darwin-arm64.tar.gz uve-darwin-arm64
+          zip uve-windows-amd64.zip uve-windows-amd64.exe
+          rm uve-*  # Remove the raw binaries
+
+      - name: Create install script
+        run: |
+          cat << 'EOF' > dist/install.sh
+          #!/bin/bash
+          # UVE installation script
+          set -euo pipefail
           
-      - name: Upload Release Assets
+          # [Previous uve-install.sh content goes here]
+          EOF
+          chmod +x dist/install.sh
+
+      - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/install.sh
+          generate_release_notes: true
+          draft: false
