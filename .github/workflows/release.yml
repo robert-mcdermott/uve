@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      
+      - name: Build and Package
+        run: |
+          chmod +x package-release.sh
+          ./package-release.sh
+          
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
