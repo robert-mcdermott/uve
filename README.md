@@ -76,6 +76,13 @@ Unblock-File -Path "$env:USERPROFILE\bin\uve-bin.exe"
 )
 ```
 
+## New Environment Behavior
+
+When creating a new environment:
+- A minimal Python environment is created
+- `uv` and `pip` are automatically installed into the environment
+- This ensures you can use both tools immediately after activation
+
 ### Set up shell integration:
 
 UVE includes automatic shell integration with all shell scripts embedded in the binary. Simply run:
@@ -87,7 +94,7 @@ uve-bin init
 #### *Note: running 'uve-bin' should only be used for the initial shell integration when first installing uve, after shell integration is complete, you'll only use the 'uve' command for all other operations*
 
 This will:
-- Detect your shell type (bash, zsh, or PowerShell)
+- Detect your shell type (bash, zsh, fish, or PowerShell)
 - Create the appropriate shell integration file
 - Update your shell configuration to load UVE automatically
 
@@ -106,6 +113,11 @@ source ~/.zshrc
 PowerShell:
 ```powershell
 Import-Module uve
+```
+
+Fish:
+```fish
+source ~/.config/fish/uve.fish
 ```
 
 ## Usage
