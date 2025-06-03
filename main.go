@@ -512,6 +512,51 @@ func listEnvs() {
 	}
 }
 
+func cloneEnv(srcName, dstName string) {
+	uveHome := getUveHome()
+	srcPath := filepath.Join(uveHome, srcName)
+	dstPath := filepath.Join(uveHome, dstName)
+
+	// Verify source exists
+	if _, err := os.Stat(srcPath); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Source environment '%s' doesn't exist\n", srcName)
+		os.Exit(1)
+	}
+
+	// Create new environment using uv
+	cmd := exec.Command("uv", "venv", "--python", filepath.Join(srcPath, "bin", "python"), dstPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to clone environment: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Copy installed packages
+	fmt.Println("Copying packages...")
+	copyDir(
+		filepath.Join(srcPath, "lib", "python*", "site-packages"),
+		filepath.Join(dstPath, "lib", "python*", "site-packages"),
+	)
+
+	fmt.Printf("Successfully cloned '%s' to '%s'\n", srcName, dstName)
+}
+
+// Helper function for directory copying
+func copyDir(srcPattern, dstPattern string) {
+	matches, _ := filepath.Glob(srcPattern)
+	if len(matches) == 0 {
+		return
+	}
+	src := matches[0]
+	dst := strings.Replace(dstPattern, "*", filepath.Base(src), 1)
+
+	cmd := exec.Command("cp", "-a", src+"/.", dst)
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+}
+
 // main is the entry point for the uve command-line tool.
 // It parses command-line arguments and dispatches to appropriate functions.
 func main() {
@@ -547,6 +592,13 @@ func main() {
 
 	case "deactivate":
 		fmt.Print(generateDeactivateScript())
+
+	case "clone":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: uve clone <source_env> <new_env>")
+			os.Exit(1)
+		}
+		cloneEnv(os.Args[2], os.Args[3])
 
 	case "delete":
 		if len(os.Args) < 3 {
