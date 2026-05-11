@@ -6,9 +6,7 @@ UVE 0.1.5 fixes a compatibility issue with `uv` where activating a uve-managed e
 
 ## What's New
 
-- **`UV_PROJECT_ENVIRONMENT` support**: Activation now exports `UV_PROJECT_ENVIRONMENT` alongside `VIRTUAL_ENV`, telling `uv` to use the uve-managed environment path instead of the project-local `.venv`.
-- **Deactivation cleanup**: `UV_PROJECT_ENVIRONMENT` is unset on deactivate.
-- **Session start sync**: Shell integration scripts now sync `UV_PROJECT_ENVIRONMENT` from `VIRTUAL_ENV` on session start, so IDEs and terminals that inherit an active environment work correctly without re-activating.
+- **`UV_PROJECT_ENVIRONMENT` shell hook**: Shell integration now registers a `precmd` (zsh) / `PROMPT_COMMAND` (bash) hook that keeps `UV_PROJECT_ENVIRONMENT` in sync with `VIRTUAL_ENV` before each command. This tells `uv` to use the uve-managed environment instead of creating a local `.venv`, and correctly handles IDEs (e.g. PyCharm) that inject `VIRTUAL_ENV` after the shell initialises.
 
 ## Compatibility
 

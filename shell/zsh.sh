@@ -14,13 +14,11 @@ uve() {
                 return 1
             fi
             eval "$(uve-bin activate "$2")"
-            export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
             # Update prompt to show environment name
             export PS1="($2) $UVE_OLD_PS1"
             ;;
         "deactivate")
             eval "$(uve-bin deactivate)"
-            unset UV_PROJECT_ENVIRONMENT
             # Restore original prompt
             export PS1="$UVE_OLD_PS1"
             ;;
@@ -44,10 +42,17 @@ uve() {
     esac
 }
 
-# Sync UV_PROJECT_ENVIRONMENT on session start if VIRTUAL_ENV already set
-if [ -n "$VIRTUAL_ENV" ]; then
-    export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
-fi
+# Keep UV_PROJECT_ENVIRONMENT in sync with VIRTUAL_ENV before each command.
+# Handles IDEs (e.g. PyCharm) that inject VIRTUAL_ENV after .zshrc runs.
+_uve_sync_uv_env() {
+    if [ -n "$VIRTUAL_ENV" ]; then
+        export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
+    elif [ -n "$UV_PROJECT_ENVIRONMENT" ]; then
+        unset UV_PROJECT_ENVIRONMENT
+    fi
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _uve_sync_uv_env
 
 # Check if the script is being sourced
 if [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]; then
