@@ -14,11 +14,13 @@ uve() {
                 return 1
             fi
             eval "$(uve-bin activate "$2")"
+            export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
             # Update prompt to show environment name
             export PS1="($2) $UVE_OLD_PS1"
             ;;
         "deactivate")
             eval "$(uve-bin deactivate)"
+            unset UV_PROJECT_ENVIRONMENT
             # Restore original prompt
             export PS1="$UVE_OLD_PS1"
             ;;
@@ -41,6 +43,11 @@ uve() {
             ;;
     esac
 }
+
+# Sync UV_PROJECT_ENVIRONMENT on session start if VIRTUAL_ENV already set
+if [ -n "$VIRTUAL_ENV" ]; then
+    export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
+fi
 
 # Check if the script is being sourced
 if [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]; then

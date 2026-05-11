@@ -1,3 +1,21 @@
+# UVE 0.1.5 Release Notes
+
+## Overview
+
+UVE 0.1.5 fixes a compatibility issue with `uv` where activating a uve-managed environment inside a `uv` project would cause `uv` to ignore `VIRTUAL_ENV` and create a local `.venv` instead.
+
+## What's New
+
+- **`UV_PROJECT_ENVIRONMENT` support**: Activation now exports `UV_PROJECT_ENVIRONMENT` alongside `VIRTUAL_ENV`, telling `uv` to use the uve-managed environment path instead of the project-local `.venv`.
+- **Deactivation cleanup**: `UV_PROJECT_ENVIRONMENT` is unset on deactivate.
+- **Session start sync**: Shell integration scripts now sync `UV_PROJECT_ENVIRONMENT` from `VIRTUAL_ENV` on session start, so IDEs and terminals that inherit an active environment work correctly without re-activating.
+
+## Compatibility
+
+UVE 0.1.5 is fully compatible with previous versions. No changes to existing environments or workflows are required.
+
+---
+
 # UVE 0.1.4 Release Notes
 
 ## Overview
