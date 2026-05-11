@@ -14,7 +14,7 @@ import (
 
 // Version information
 const (
-	VERSION = "0.1.4"
+	VERSION = "0.1.5"
 )
 
 // Embed the shell integration scripts into the binary at compile time
@@ -105,14 +105,14 @@ func generateActivateScript(envPath string) string {
 	if runtime.GOOS == "windows" {
 		return fmt.Sprintf(`$env:UVE_OLD_PATH = $env:PATH
 $env:VIRTUAL_ENV = "%s"
+$env:UV_PROJECT_ENVIRONMENT = "%s"
 $env:PATH = "%s\Scripts;" + $env:PATH
-`, envPath, envPath)
+`, envPath, envPath, envPath)
 	}
 	return fmt.Sprintf(`export UVE_OLD_PATH="$PATH"
 export VIRTUAL_ENV="%s"
-export UV_PROJECT_ENVIRONMENT="%s"
 export PATH="%s/bin:$PATH"
-`, envPath, envPath, envPath)
+`, envPath, envPath)
 }
 
 // generateDeactivateScript generates a shell script to deactivate the current virtual environment.
@@ -125,6 +125,7 @@ func generateDeactivateScript() string {
     Remove-Item Env:\UVE_OLD_PATH
 }
 Remove-Item Env:\VIRTUAL_ENV -ErrorAction SilentlyContinue
+Remove-Item Env:\UV_PROJECT_ENVIRONMENT -ErrorAction SilentlyContinue
 `
 	}
 	return `if [ -n "$UVE_OLD_PATH" ]; then

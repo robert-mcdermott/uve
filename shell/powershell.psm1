@@ -32,6 +32,8 @@ function uve {
                 # Invoke the single string script to modify the session
                 Invoke-Expression $activateScript
 
+                $env:UV_PROJECT_ENVIRONMENT = $env:VIRTUAL_ENV
+
                 # Update prompt to show the active environment
                 $Global:UVE_ACTIVE_ENV = $envName
                 $function:prompt = {
@@ -45,6 +47,8 @@ function uve {
 
             if ($LASTEXITCODE -eq 0) {
                 Invoke-Expression $deactivateScript
+
+                Remove-Item Env:UV_PROJECT_ENVIRONMENT -ErrorAction SilentlyContinue
 
                 # Restore original prompt
                 $function:prompt = $Global:UVE_OLD_PROMPT
@@ -72,6 +76,11 @@ function uve {
             uve-bin $AllArgs
         }
     }
+}
+
+# Sync UV_PROJECT_ENVIRONMENT on session start if VIRTUAL_ENV already set
+if ($env:VIRTUAL_ENV) {
+    $env:UV_PROJECT_ENVIRONMENT = $env:VIRTUAL_ENV
 }
 
 # Export the function so it's visible as a module command

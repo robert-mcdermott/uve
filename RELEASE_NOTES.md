@@ -1,3 +1,19 @@
+# UVE 0.1.5 Release Notes
+
+## Overview
+
+UVE 0.1.5 fixes a compatibility issue with `uv` where activating a uve-managed environment inside a `uv` project would cause `uv` to ignore `VIRTUAL_ENV` and create a local `.venv` instead.
+
+## What's New
+
+- **`UV_PROJECT_ENVIRONMENT` shell hook**: Shell integration now registers a `precmd` (zsh) / `PROMPT_COMMAND` (bash) hook that keeps `UV_PROJECT_ENVIRONMENT` in sync with `VIRTUAL_ENV` before each command. This tells `uv` to use the uve-managed environment instead of creating a local `.venv`, and correctly handles IDEs (e.g. PyCharm) that inject `VIRTUAL_ENV` after the shell initialises.
+
+## Compatibility
+
+UVE 0.1.5 is fully compatible with previous versions. No changes to existing environments or workflows are required.
+
+---
+
 # UVE 0.1.4 Release Notes
 
 ## Overview

@@ -269,12 +269,14 @@ UVE manages Python virtual environments in a central location (`~/.uve` by defau
 
 1. Your original PATH is saved
 2. The environment's bin/Scripts directory is added to PATH
-3. VIRTUAL_ENV is set to the environment path
+3. `VIRTUAL_ENV` is set to the environment path
 
 When deactivating:
 
 1. Original PATH is restored
-2. Environment variables are cleaned up
+2. `VIRTUAL_ENV` is unset
+
+`UV_PROJECT_ENVIRONMENT` is kept in sync with `VIRTUAL_ENV` before each command via a shell hook, so `uv` always uses the uve-managed environment — even when IDEs (e.g. PyCharm) inject `VIRTUAL_ENV` after the shell starts.
 
 ## Troubleshooting
 
@@ -300,6 +302,7 @@ When deactivating:
 
 - `UVE_HOME`: Custom location for environments
 - `VIRTUAL_ENV`: Set by activation (don't set manually)
+- `UV_PROJECT_ENVIRONMENT`: Kept in sync with `VIRTUAL_ENV` by a shell hook before each command; tells `uv` to use the uve-managed environment instead of creating a local `.venv`
 - `UVE_OLD_PATH`: Stores original PATH during activation
 
 ## Contributing

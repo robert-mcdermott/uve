@@ -42,6 +42,18 @@ uve() {
     esac
 }
 
+# Keep UV_PROJECT_ENVIRONMENT in sync with VIRTUAL_ENV before each command.
+# Handles IDEs (e.g. PyCharm) that inject VIRTUAL_ENV after .zshrc runs.
+_uve_sync_uv_env() {
+    if [ -n "$VIRTUAL_ENV" ]; then
+        export UV_PROJECT_ENVIRONMENT="$VIRTUAL_ENV"
+    elif [ -n "$UV_PROJECT_ENVIRONMENT" ]; then
+        unset UV_PROJECT_ENVIRONMENT
+    fi
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _uve_sync_uv_env
+
 # Check if the script is being sourced
 if [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]; then
     : # Script is being sourced, do nothing
